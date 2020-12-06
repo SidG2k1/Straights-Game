@@ -46,3 +46,6 @@ straights
 *.cb
 *.cb2
 .*.lb
+
+# VS Code stuff
+.vscode/
