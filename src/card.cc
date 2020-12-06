@@ -1,6 +1,7 @@
 #include "card.h"
 
 Card::Card(char value, char suite) {
+    setValue(value);
     setSuite(suite);
 }
 
