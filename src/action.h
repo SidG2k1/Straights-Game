@@ -6,10 +6,11 @@
 // this class can easily be a struct instead, but this setup allows for more consistency
 class Action {
     public:
+        Action();
         Card card;
-        bool isPlay;
-        bool isDiscard;
-        bool isQuit;
+        bool isPlay = false;
+        bool isDiscard = false;
+        bool isQuit = false;
 };
 
 #endif
