@@ -55,8 +55,6 @@ int Card::getRank() {
 }
 
 char* Card::getName() {
-    char name[2];
-    name[0] = value;
-    name[1] = suite;
+    char name[3] = {value, suite, '\0'};
     return name;
 }
