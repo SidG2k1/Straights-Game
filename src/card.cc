@@ -53,3 +53,10 @@ int Card::getRank() {
         }
     }
 }
+
+char* Card::getName() {
+    char name[2];
+    name[0] = value;
+    name[1] = suite;
+    return name;
+}
