@@ -58,3 +58,23 @@ char* Card::getName() {
     char name[3] = {value, suite, '\0'};
     return name;
 }
+
+int Card::suiteToEnum(char suite) {
+    switch (suite)
+    {
+    case 'C':
+        return 0;
+        break;
+    case 'D':
+        return 1;
+        break;
+    case 'H':
+        return 2;
+        break;
+    case 'S':
+        return 3;
+        break;
+    default:
+        break;
+    }
+}

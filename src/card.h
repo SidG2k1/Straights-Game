@@ -15,6 +15,10 @@ class Card {
 
         int getRank();
         char* getName();
+
+        // FIXME: better implementation exist for the following
+        //  method
+        static int suiteToEnum(char suite);
 };
 
 class InvalidCardData {};
