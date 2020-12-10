@@ -8,10 +8,10 @@ bool existsLegalPlay(Board* board, std::vector<Card> cards) {
 }
 
 Action HumanPlayer::getAction() {
-    // FIXME: Consider case of len(dealtCards) = 0
+    // FIXME: In case of len(dealtCards) = 0; the round should be ending
     Action act;
-    printState();
-    std::cout << "> "; // awaiting user input
+    if (toPrintState) { printState();}
+    std::cout << ">"; // awaiting user input
     std::string command;
     std::cin >> command;
 
@@ -23,7 +23,8 @@ Action HumanPlayer::getAction() {
             act.card = ccard;
             act.isPlay = true;
         } else {
-            std::cout << "Please make your selection again\n";
+            toPrintState = false;
+            std::cout << "This is not a legal play.\n";
             act = getAction();
         }
     } else if (command == "ragequit") {
@@ -36,7 +37,8 @@ Action HumanPlayer::getAction() {
             act.card = ccard;
             act.isDiscard = true;
         } else {
-            std::cout << "Please make your selection again\n";
+            toPrintState = false;
+            std::cout << "You have a legal play. You may not discard.\n";
             act = getAction();
         }
     } else if (command == "deck") {
@@ -50,6 +52,7 @@ Action HumanPlayer::getAction() {
         std::cout << "Please make your selection again\n";
         act = getAction();
     }
+    toPrintState = true;
     return act;
 }
 

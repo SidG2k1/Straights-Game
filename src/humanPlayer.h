@@ -5,6 +5,7 @@
 
 class HumanPlayer: public Player {
     private:
+        bool toPrintState = true;
         void printState();
     public:
         Action getAction() override;
