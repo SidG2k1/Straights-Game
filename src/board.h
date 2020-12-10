@@ -15,7 +15,7 @@ class Board {
         void initPlayers();
 
         //
-        std::vector<Card> deck;
+        std::vector<Card> shuffledDeck;
     public:
         // Initializes the board
         Board();

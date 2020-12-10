@@ -54,7 +54,7 @@ bool Board::isLegal(Card card) {
 
 void Board::printDeck() {
     for (int i = 0; i < 52; ++i) {
-        std::cout << deck[i].getName() << " ";
+        std::cout << shuffledDeck[i].getName() << " ";
         if ((i != 0) && (i%13 == 0)) {std::cout << std::endl;}
     }
 }
@@ -64,6 +64,7 @@ void Board::rageQuit(Player* player) {
     for (int i = 0; playerIdx <= 4; ++playerIdx) {
         if (players[playerIdx].dealtCards == player->dealtCards) {
             // Dealt Cards is uniquely identifying
+            std::cout << "Player " << playerIdx + 1 << "ragequits. A computer will now take over." << std::endl;
             break;
         }
     }
