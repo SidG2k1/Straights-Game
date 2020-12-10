@@ -1,11 +1,18 @@
 #include "humanPlayer.h"
 
+bool existsLegalPlay(Board* board, std::vector<Card> cards) {
+    for (Card card: cards) {
+        if (board->isLegal(card)) {return true;}
+    }
+    return false;
+}
+
 Action HumanPlayer::getAction() {
+    // FIXME: Consider case of len(dealtCards) = 0
     Action act;
     printState();
     std::cout << "> "; // awaiting user input
     std::string command;
-    // TODO: enforce robustness here
     std::cin >> command;
 
     if (command == "play") {
@@ -15,9 +22,35 @@ Action HumanPlayer::getAction() {
         if (currBoard->isLegal(ccard)) {
             act.card = ccard;
             act.isPlay = true;
+        } else {
+            std::cout << "Please make your selection again\n";
+            act = getAction();
         }
+    } else if (command == "ragequit") {
+        currBoard->rageQuit(this);
+    } else if (command == "discard") {
+        std::string card;
+        std::cin >> card;
+        Card ccard{card[0], card[1]};
+        if (!existsLegalPlay(currBoard, dealtCards)) {
+            act.card = ccard;
+            act.isDiscard = true;
+        } else {
+            std::cout << "Please make your selection again\n";
+            act = getAction();
+        }
+    } else if (command == "deck") {
+        // FIXME: in act handling (up the call stack), 
+        //  consider this case where everything is false
+        currBoard->printDeck();
+    } else if (command == "quit") {
+        act.isQuit = true;
+    } else {
+        // no valid command given
+        std::cout << "Please make your selection again\n";
+        act = getAction();
     }
-    return Action{};
+    return act;
 }
 
 void HumanPlayer::printState() {
