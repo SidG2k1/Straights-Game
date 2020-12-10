@@ -16,6 +16,8 @@ class Card {
         int getRank();
         char* getName();
 
+        bool operator==(const Card &other) const;
+
         // FIXME: better implementation exist for the following
         //  method
         static int suiteToEnum(char suite);

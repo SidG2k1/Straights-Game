@@ -59,6 +59,15 @@ char* Card::getName() {
     return name;
 }
 
+bool Card::operator==(const Card &other) const {
+    if (this->suite != other.suite) {
+        return false;
+    } else if (this->value != other.value) {
+        return false;
+    }
+    return true;
+}
+
 int Card::suiteToEnum(char suite) {
     switch (suite)
     {
