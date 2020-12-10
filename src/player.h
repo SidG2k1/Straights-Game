@@ -8,6 +8,7 @@
 #include "board.h"
 
 class Player {
+    friend class Board;
     protected:
         bool isHuman;
         Board* currBoard;
