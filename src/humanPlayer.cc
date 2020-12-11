@@ -7,53 +7,87 @@ bool HumanPlayer::existsLegalPlay(Board* board, std::vector<Card> cards, std::ve
     return false;
 }
 
-Action HumanPlayer::getAction(std::vector<std::array<Card*, 13>> table) {
-    Action act;
-    if (toPrintState) { printState(table);}
-    std::cout << ">"; // awaiting user input
-    std::string command;
-    std::cin >> command;
+bool inDeck(Card card, std::vector<Card> deck) {
+    for (Card deckElem : deck) {
+        if (deckElem == card) {
+            return true;
+        }
+    }
+    return false;
+}
 
-    // TODO: Check card actually exists in hand
-    if (command == "play") {
-        std::string card;
-        std::cin >> card;
-        // FIXME: Catch invalid card e.g. XY
-        Card ccard{card[0], card[1]};
-        if (isLegal(table, ccard)) {
+Action HumanPlayer::getAction(std::vector<std::array<Card*, 13>> table, bool printTable) {
+    Action act;
+    if (printTable) {printState(table);}
+
+    while (true) {
+        std::cout << ">"; // awaiting user input
+        std::string command;
+        std::cin >> command;
+
+        std::string cardName;
+        Card ccard;
+        if (command == "play") {
+            try {
+                std::cin >> cardName;
+                ccard.setValue(cardName[0]);
+                ccard.setSuite(cardName[1]);
+            } catch (...) {
+                std::cout << "This is not a legal play." << std::endl;
+                continue;
+            }
+
+            if (!isLegal(table, ccard)) {
+                std::cout << "This is not a legal play." << std::endl;
+                continue;
+            }
+            else if (!inDeck(ccard, dealtCards)) {
+                std::cout << "This is not a legal play." << std::endl;
+                continue;
+            }
+
             act.card = ccard;
             act.isPlay = true;
-        } else {
-            toPrintState = false;
-            std::cout << "This is not a legal play.\n";
-            act = getAction(table);
+            break;
         }
-    } else if (command == "ragequit") {
-        act.isRageQuit = true;
-    } else if (command == "discard") {
-        std::string card;
-        std::cin >> card;
-        Card ccard{card[0], card[1]};
-        if (!existsLegalPlay(currBoard, dealtCards, table)) {
+        else if (command == "discard") {
+            try {
+                std::cin >> cardName;
+                ccard.setValue(cardName[0]);
+                ccard.setSuite(cardName[1]);
+            } catch (...) {
+                std::cout << "Couldn't read selected card." << std::endl;
+                continue;
+            }
+
+            if (existsLegalPlay(currBoard, dealtCards, table)) {
+                std::cout << "You have a legal play. You may not discard." << std::endl;
+                continue;
+            }
+            else if (!inDeck(ccard, dealtCards)) {
+                std::cout << "You don't have this card." << std::endl;
+                continue;
+            }
+
             act.card = ccard;
             act.isDiscard = true;
-        } else {
-            toPrintState = false;
-            std::cout << "You have a legal play. You may not discard.\n";
-            act = getAction(table);
+            break;
         }
-    } else if (command == "deck") {
-        act.isDeck = true;
-    } else if (command == "quit" || command == "") {
-        // empty string represents EOF command given (Ctrl-D)
-        act.isQuit = true;
-    } else {
-        // no valid command given
-        std::cout << "Couldn't understand command: " << command << std::endl;
-        toPrintState = false;
-        act = getAction(table);
+        else if (command == "deck") {
+            act.isDeck = true;
+        }
+        else if (command == "quit" || command == "") {
+            act.isQuit = true;
+            break;
+        }
+        else if (command == "ragequit") {
+            act.isRageQuit = true;
+            break;
+        }
+        else {
+            std::cout << "Invalid command: " << command << ". Please make your selection again" << std::endl;
+        }
     }
-    toPrintState = true;
     return act;
 }
 
