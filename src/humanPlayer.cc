@@ -8,16 +8,17 @@ bool HumanPlayer::existsLegalPlay(Board* board, std::vector<Card> cards, std::ve
 }
 
 Action HumanPlayer::getAction(std::vector<std::array<Card*, 13>> table) {
-    // FIXME: In case of len(dealtCards) = 0; the round should be ending
     Action act;
     if (toPrintState) { printState(table);}
     std::cout << ">"; // awaiting user input
     std::string command;
     std::cin >> command;
 
+    // TODO: Check card actually exists in hand
     if (command == "play") {
         std::string card;
         std::cin >> card;
+        // FIXME: Catch invalid card e.g. XY
         Card ccard{card[0], card[1]};
         if (isLegal(table, ccard)) {
             act.card = ccard;
@@ -43,11 +44,12 @@ Action HumanPlayer::getAction(std::vector<std::array<Card*, 13>> table) {
         }
     } else if (command == "deck") {
         act.isDeck = true;
-    } else if (command == "quit") {
+    } else if (command == "quit" || command == "") {
+        // empty string represents EOF command given (Ctrl-D)
         act.isQuit = true;
     } else {
         // no valid command given
-        std::cout << "Please make your selection again\n";
+        std::cout << "Couldn't understand command: " << command << std::endl;
         toPrintState = false;
         act = getAction(table);
     }

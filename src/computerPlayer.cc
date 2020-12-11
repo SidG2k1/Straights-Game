@@ -11,9 +11,7 @@ Action ComputerPlayer::getAction(std::vector<std::array<Card*, 13>> table) {
         }
     }
     // now needs to discard
-    // FIXME: In case of len(dealtCards) = 0; the game should finish
     act.isDiscard = true;
     act.card = dealtCards[0];
-    // dealtCards.erase(dealtCards.begin());   //// Should do this in Action handler
     return act;
 }
