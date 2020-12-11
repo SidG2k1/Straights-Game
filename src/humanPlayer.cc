@@ -1,16 +1,16 @@
 #include "humanPlayer.h"
 
-bool existsLegalPlay(Board* board, std::vector<Card> cards) {
+bool HumanPlayer::existsLegalPlay(Board* board, std::vector<Card> cards, std::vector<Card*[13]> table) {
     for (Card card: cards) {
-        if (board->isLegal(card)) {return true;}
+        if (isLegal(table, card)) {return true;}
     }
     return false;
 }
 
-Action HumanPlayer::getAction() {
+Action HumanPlayer::getAction(std::vector<Card*[13]> table) {
     // FIXME: In case of len(dealtCards) = 0; the round should be ending
     Action act;
-    if (toPrintState) { printState();}
+    if (toPrintState) { printState(table);}
     std::cout << ">"; // awaiting user input
     std::string command;
     std::cin >> command;
@@ -19,53 +19,52 @@ Action HumanPlayer::getAction() {
         std::string card;
         std::cin >> card;
         Card ccard{card[0], card[1]};
-        if (currBoard->isLegal(ccard)) {
+        if (isLegal(table, ccard)) {
             act.card = ccard;
             act.isPlay = true;
         } else {
             toPrintState = false;
             std::cout << "This is not a legal play.\n";
-            act = getAction();
+            act = getAction(table);
         }
     } else if (command == "ragequit") {
-        currBoard->rageQuit(this);
+        act.isRageQuit = true;
     } else if (command == "discard") {
         std::string card;
         std::cin >> card;
         Card ccard{card[0], card[1]};
-        if (!existsLegalPlay(currBoard, dealtCards)) {
+        if (!existsLegalPlay(currBoard, dealtCards, table)) {
             act.card = ccard;
             act.isDiscard = true;
         } else {
             toPrintState = false;
             std::cout << "You have a legal play. You may not discard.\n";
-            act = getAction();
+            act = getAction(table);
         }
     } else if (command == "deck") {
-        // FIXME: in act handling (up the call stack), 
-        //  consider this case where everything is false
-        currBoard->printDeck();
+        act.isDeck = true;
     } else if (command == "quit") {
         act.isQuit = true;
     } else {
         // no valid command given
         std::cout << "Please make your selection again\n";
-        act = getAction();
+        toPrintState = false;
+        act = getAction(table);
     }
     toPrintState = true;
     return act;
 }
 
-void HumanPlayer::printState() {
+void HumanPlayer::printState(std::vector<Card*[13]> table) {
     std::cout << "Cards on the table:" << std::endl;
     std::cout << "Clubs: ";
-    printDeck(currBoard, 0);
+    printDeck(currBoard, 0, table);
     std::cout << "Diamonds: ";
-    printDeck(currBoard, 1);
+    printDeck(currBoard, 1, table);
     std::cout << "Hearts: ";
-    printDeck(currBoard, 2);
+    printDeck(currBoard, 2, table);
     std::cout << "Spades: ";
-    printDeck(currBoard, 3);
+    printDeck(currBoard, 3, table);
 
     std::cout << "Your hand: ";
     for (Card ccard : dealtCards) {
@@ -75,16 +74,16 @@ void HumanPlayer::printState() {
 
     std::cout << "Legal plays: ";
     for (Card card: dealtCards) {
-        if (currBoard->isLegal(card)) {
+        if (isLegal(table, card)) {
             std::cout << card.getName() << " ";
         }
     }
     std::cout << std::endl;
 }
 
-void printDeck(Board* board, int suite) {
+void printDeck(Board* board, int suite, std::vector<Card*[13]> table) {
     for (int i = 0; i < 13; ++i) {
-        Card* ccard = board->table.at(suite)[i];
+        Card* ccard = table.at(suite)[i];
         if (ccard != nullptr) {
             std::cout << ccard->getName() << " ";
         }
