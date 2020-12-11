@@ -11,6 +11,8 @@ class Action {
         bool isPlay = false;
         bool isDiscard = false;
         bool isQuit = false;
+        bool isRageQuit = false;
+        bool isDeck = true;
 };
 
 #endif
