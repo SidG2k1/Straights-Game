@@ -45,7 +45,7 @@ void Board::printDeck() {
 }
 
 void Board::rageQuit(int playerIdx) {
-    std::cout << "Player " << playerIdx + 1 << "ragequits. A computer will now take over." << std::endl;
+    std::cout << "Player" << playerIdx + 1 << " ragequits. A computer will now take over." << std::endl;
 
     auto newPlayer = std::make_shared<ComputerPlayer>();
     newPlayer.get()->currBoard = this; // which is equal to player.currBoard
@@ -128,64 +128,95 @@ void Board::start(int seed) {
             if (found) {break;}
         }
 
-        int lastPlayerIdx = (playerIdxWith7S == 0)?4:(playerIdxWith7S - 1);
+        std::cout << "A new round begins. It's Player" << playerIdxWith7S + 1 << "'s turn to play.";
+
         int currentPlayerIdx = playerIdxWith7S;
         // play game until cards run out
-        while (players[lastPlayerIdx].get()->dealtCards.size() != 0) {
-            // ^^^^^ Not all cards have been played yet by the final player.
+        while (players[currentPlayerIdx].get()->dealtCards.size() != 0) {
+            // ^^^^^ Not all cards have been played yet by the player. (when this statement
+            // evaluates to false, all players have played all cards.)
+            bool printTable = true;
+            while (true) {
+                Action act = players[currentPlayerIdx].get()->getAction(table, printTable);
+                // Consider throwing a "QuitSignal"
 
-            Action act = players[currentPlayerIdx].get()->getAction(table);
-            // Consider throwing a "QuitSignal"
+                if (act.isPlay) {
+                    std::cout << "Player" << currentPlayerIdx + 1 << " plays " << act.card.getName() << ".\n";
 
-            if (act.isPlay) {
-                std::cout << "Player" << currentPlayerIdx + 1 << " plays " << act.card.getName() << ".\n";
+                    // add card to table
+                    auto card = std::make_shared<Card>();
+                    card.get()->setSuite(act.card.getSuite());
+                    card.get()->setValue(act.card.getValue());
 
-                // add card to table
-                auto card = std::make_shared<Card>(act.card);
-                smartCardPtrStore.push_back(card);
-                table[Card::suiteToEnum(act.card.getSuite())][act.card.getValue() - 1] = card.get();
+                    smartCardPtrStore.push_back(card); // so that card doesn't get destroyed
+                    table[Card::suiteToEnum(act.card.getSuite())][act.card.getRank() - 1] = card.get();
 
-                auto dealtCards = &(players[currentPlayerIdx].get()->dealtCards);
+                    auto dealtCards = &(players[currentPlayerIdx].get()->dealtCards);
 
-                // remove card from player deck
-                int deckSize = dealtCards->size();
-                for (int i = 0; i < deckSize; ++i) {
-                    if ((*dealtCards)[i] == *card.get()) {
-                        dealtCards->erase(dealtCards->begin() + i);
+                    // remove card from player deck
+                    int deckSize = dealtCards->size();
+                    for (int i = 0; i < deckSize; ++i) {
+                        if ((*dealtCards)[i] == *card.get()) {
+                            dealtCards->erase(dealtCards->begin() + i);
+                        }
                     }
-                }
-            } 
-            else if (act.isDiscard) {
-                std::cout << "Player" << currentPlayerIdx + 1 << " discards " << act.card.getName() << ".\n";
-                players[currentPlayerIdx].get()->discardRankSum += act.card.getRank();
+                    break;
+                } 
+                else if (act.isDiscard) {
+                    std::cout << "Player" << currentPlayerIdx + 1 << " discards " << act.card.getName() << ".\n";
+                    players[currentPlayerIdx].get()->discardRankSum += act.card.getRank();
 
-                auto dealtCards = &(players[currentPlayerIdx].get()->dealtCards);
+                    auto dealtCards = &(players[currentPlayerIdx].get()->dealtCards);
 
-                // remove card from player deck
-                int deckSize = dealtCards->size();
-                for (int i = 0; i < deckSize; ++i) {
-                    if ((*dealtCards)[i] == act.card) {
-                        dealtCards->erase(dealtCards->begin() + i);
+                    // remove card from player deck
+                    int deckSize = dealtCards->size();
+                    for (int i = 0; i < deckSize; ++i) {
+                        if ((*dealtCards)[i] == act.card) {
+                            dealtCards->erase(dealtCards->begin() + i);
+                        }
                     }
+                    playerDiscardStash[currentPlayerIdx].push_back(act.card);
+                    break;
+                } 
+                else if (act.isQuit) {
+                    throw QuitSignal{};
+                    break;
+                } 
+                else if (act.isRageQuit) {
+                    rageQuit(currentPlayerIdx);
+                    // break; // No break since computer need to play
+                } 
+                else if (act.isDeck) {
+                    printDeck();
+                    printTable = false;
                 }
-            } 
-            else if (act.isQuit) {
-                throw QuitSignal{};
-            } 
-            else if (act.isRageQuit) {
-                rageQuit(currentPlayerIdx);
-            } 
-            else if (act.isDeck) {
-                // Should be handled inside of Player::getAction
-                // SHOULDNT REACH HERE
-                throw std::exception{};
             }
-
             currentPlayerIdx = (currentPlayerIdx + 1) % 4;
         }
         
-        // TODO: End of round summary
+        // End of round summary
+        for (int i = 0; i < 4; ++i) {
+            std::cout << "Player" << i + 1 << "'s discards: ";
+            for (Card discard : playerDiscardStash[i]) {std::cout << discard.getName() << " ";}
+            std::cout << std::endl;
+
+            std::cout << "Player" << i + 1 << "'s score: ";
+            if (playerDiscardStash[i].size() > 0) {std::cout << playerDiscardStash[i][0].getRank();}
+            for (Card discard : playerDiscardStash[i]) {std::cout << " + " << discard.getRank();}
+            std::cout << " = " << players[i].get()->discardRankSum;
+        }
     }
 
-    // TODO: End of game summary (i.e. state winner)
+    // End of game summary (i.e. state winner)
+    int minScore = (13 + 1) * (52 + 1); // larger than any possible discardRankSum
+    int minRankPlayerIdx = 0;
+    for (; minRankPlayerIdx < 4; ++minRankPlayerIdx) {
+        int playerScore = players[minRankPlayerIdx].get()->discardRankSum;
+        if (playerScore < minScore) {
+            minScore = playerScore;
+            break;
+        }
+    }
+
+    std::cout << "Player" << minRankPlayerIdx + 1 << " wins!";
 }

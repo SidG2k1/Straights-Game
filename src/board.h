@@ -29,6 +29,7 @@ class Board {
         // Returns the maximum Player::discardRankSum among all Board::players
         int maxDiscardSum();
 
+        std::array<std::vector<Card>, 4> playerDiscardStash;
         std::vector<std::shared_ptr<Card>> smartCardPtrStore;
     public:
         // Initializes the board
