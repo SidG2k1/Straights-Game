@@ -5,17 +5,31 @@
 #include "humanPlayer.h"
 #include "computerPlayer.h"
 
+#include <algorithm>
+#include <random>
+#include <memory>
+
 class Board {
     private:
         // The group of players in the game
-        Player* players[4];
+        std::array<std::shared_ptr<Player>, 4> players;
 
         // Adds a new player to the game. Must have less than 4
         //     players already
         void initPlayers();
 
-        //
         std::vector<Card> shuffledDeck;
+
+        // Shuffles Board::shuffledDeck with the given seed
+        void shuffleDeck(int seed);
+
+        // Deals cards from shuffledDeck to the players (and clears their dealt card list)
+        void dealCards();
+
+        // Returns the maximum Player::discardRankSum among all Board::players
+        int maxDiscardSum();
+
+        std::vector<std::shared_ptr<Card>> smartCardPtrStore;
     public:
         // Initializes the board
         Board();
@@ -30,7 +44,12 @@ class Board {
 
         // Player chooses to end their gaming, and is replaced by
         //   a ComputerPlayer
-        void rageQuit(Player* player);
+        void rageQuit(int playerIdx);
+
+        // This is the primary method of play.
+        void start(int seed);
 };
+
+class QuitSignal{};
 
 #endif
