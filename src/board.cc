@@ -235,5 +235,5 @@ void Board::start(int seed) {
         }
     }
 
-    std::cout << "Player" << minRankPlayerIdx + 1 << " wins!";
+    std::cout << "Player" << minRankPlayerIdx + 1 << " wins!" << std::endl;
 }
