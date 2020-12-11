@@ -5,6 +5,7 @@
 *.slo
 *.lo
 *.o
+*.tdo
 *.obj
 
 # Precompiled Headers
@@ -31,3 +32,20 @@
 *.out
 *.app
 straights
+
+# LaTeX auxiliary files:
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+
+# VS Code stuff
+.vscode/
