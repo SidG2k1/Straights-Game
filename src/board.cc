@@ -21,10 +21,10 @@ void Board::initPlayers() {
         }
         if (playerType == "h") {
             HumanPlayer player;
-            players[i] = player;
+            players[i] = &player;
         } else if (playerType == "c") {
             ComputerPlayer player;
-            players[i] = player;
+            players[i] = &player;
         }
     }
 }
@@ -39,7 +39,7 @@ void Board::printDeck() {
 void Board::rageQuit(Player* player) {
     int playerIdx = 0;
     for (; playerIdx <= 4; ++playerIdx) {
-        if (players[playerIdx].dealtCards == player->dealtCards) {
+        if (players[playerIdx]->dealtCards == player->dealtCards) {
             // Dealt Cards is uniquely identifying
             std::cout << "Player " << playerIdx + 1 << "ragequits. A computer will now take over." << std::endl;
             break;
@@ -47,8 +47,8 @@ void Board::rageQuit(Player* player) {
     }
     ComputerPlayer newPlayer;
     newPlayer.currBoard = this; // which is equal to player.currBoard
-    newPlayer.dealtCards = players[playerIdx].dealtCards;
-    newPlayer.discardRankSum = players[playerIdx].discardRankSum;
+    newPlayer.dealtCards = players[playerIdx]->dealtCards;
+    newPlayer.discardRankSum = players[playerIdx]->discardRankSum;
     newPlayer.isHuman = false;
-    players[playerIdx] = newPlayer;
+    players[playerIdx] = &newPlayer;
 }

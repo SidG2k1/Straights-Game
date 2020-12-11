@@ -20,6 +20,7 @@ class Player {
         // Checks if playing card is legal on the specified table
         bool isLegal(std::vector<std::array<Card*, 13>> table, Card card);
     public:
+        virtual ~Player() = 0;
         virtual Action getAction(std::vector<std::array<Card*, 13>> table);
 };
 

@@ -1,6 +1,10 @@
 #include "player.h"
 
-bool isLegal(std::vector<std::array<Card*, 13>> table, Card card) {
+Player::~Player() {
+    // Since following RAII principle, nothing to destroy.
+}
+
+bool Player::isLegal(std::vector<std::array<Card*, 13>> table, Card card) {
     if (card.getRank() == 7) {return true;}
     else {
         std::array<Card *, 13> deck = table[card.suiteToEnum(card.getSuite())];
@@ -21,4 +25,8 @@ bool isLegal(std::vector<std::array<Card*, 13>> table, Card card) {
         }
         return false;
     }
+}
+
+Action Player::getAction(std::vector<std::array<Card*, 13>> table) {
+    return Action{};
 }

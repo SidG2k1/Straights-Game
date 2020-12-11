@@ -1,13 +1,14 @@
 #ifndef BOARD
 #define BOARD
 
+#include "player.h"
 #include "humanPlayer.h"
 #include "computerPlayer.h"
 
 class Board {
     private:
         // The group of players in the game
-        Player players[4];
+        Player* players[4];
 
         // Adds a new player to the game. Must have less than 4
         //     players already
@@ -18,6 +19,8 @@ class Board {
     public:
         // Initializes the board
         Board();
+
+        ~Board() {}
 
         // The group of 4 suites of 13 cards each.
         //     nullptr representes an unplayed card.

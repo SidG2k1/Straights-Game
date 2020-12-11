@@ -7,6 +7,8 @@
 class Action {
     public:
         Action();
+        ~Action() {}
+
         Card card;
         bool isPlay = false;
         bool isDiscard = false;

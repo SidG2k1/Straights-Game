@@ -1,5 +1,11 @@
 #include "card.h"
 
+Card::Card() {
+    // defaut, not intended for significant use
+    suite = '\0';
+    value = '\0';
+}
+
 Card::Card(char value, char suite) {
     setValue(value);
     setSuite(suite);
@@ -49,13 +55,16 @@ int Card::getRank() {
             return 13;
             break;
         default:
+            throw InvalidCardData{};
             break;
         }
     }
 }
 
-char* Card::getName() {
-    char name[3] = {value, suite, '\0'};
+std::string Card::getName() {
+    std::string name = "";
+    name += value;
+    name += suite;
     return name;
 }
 
@@ -84,6 +93,7 @@ int Card::suiteToEnum(char suite) {
         return 3;
         break;
     default:
+        throw InvalidCardData{};
         break;
     }
 }
