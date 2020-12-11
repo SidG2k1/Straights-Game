@@ -1,6 +1,6 @@
 #include "computerPlayer.h"
 
-Action ComputerPlayer::getAction(std::vector<Card*[13]> table) {
+Action ComputerPlayer::getAction(std::vector<std::array<Card*, 13>> table) {
     // currently plays the first availabe action (tries all plays first then dicards)
     Action act;
     for (Card card : dealtCards) {

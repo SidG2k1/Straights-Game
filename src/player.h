@@ -18,9 +18,9 @@ class Player {
         int discardRankSum;
 
         // Checks if playing card is legal on the specified table
-        bool isLegal(std::vector<Card*[13]> table, Card card);
+        bool isLegal(std::vector<std::array<Card*, 13>> table, Card card);
     public:
-        virtual Action getAction(std::vector<Card*[13]> table);
+        virtual Action getAction(std::vector<std::array<Card*, 13>> table);
 };
 
 

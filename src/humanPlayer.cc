@@ -1,13 +1,13 @@
 #include "humanPlayer.h"
 
-bool HumanPlayer::existsLegalPlay(Board* board, std::vector<Card> cards, std::vector<Card*[13]> table) {
+bool HumanPlayer::existsLegalPlay(Board* board, std::vector<Card> cards, std::vector<std::array<Card*, 13>> table) {
     for (Card card: cards) {
         if (isLegal(table, card)) {return true;}
     }
     return false;
 }
 
-Action HumanPlayer::getAction(std::vector<Card*[13]> table) {
+Action HumanPlayer::getAction(std::vector<std::array<Card*, 13>> table) {
     // FIXME: In case of len(dealtCards) = 0; the round should be ending
     Action act;
     if (toPrintState) { printState(table);}
@@ -55,7 +55,17 @@ Action HumanPlayer::getAction(std::vector<Card*[13]> table) {
     return act;
 }
 
-void HumanPlayer::printState(std::vector<Card*[13]> table) {
+void printDeck(Board* board, int suite, std::vector<std::array<Card*, 13>> table) {
+    for (int i = 0; i < 13; ++i) {
+        Card* ccard = table.at(suite)[i];
+        if (ccard != nullptr) {
+            std::cout << ccard->getName() << " ";
+        }
+    }
+    std::cout << std::endl;
+}
+
+void HumanPlayer::printState(std::vector<std::array<Card*, 13>> table) {
     std::cout << "Cards on the table:" << std::endl;
     std::cout << "Clubs: ";
     printDeck(currBoard, 0, table);
@@ -76,16 +86,6 @@ void HumanPlayer::printState(std::vector<Card*[13]> table) {
     for (Card card: dealtCards) {
         if (isLegal(table, card)) {
             std::cout << card.getName() << " ";
-        }
-    }
-    std::cout << std::endl;
-}
-
-void printDeck(Board* board, int suite, std::vector<Card*[13]> table) {
-    for (int i = 0; i < 13; ++i) {
-        Card* ccard = table.at(suite)[i];
-        if (ccard != nullptr) {
-            std::cout << ccard->getName() << " ";
         }
     }
     std::cout << std::endl;

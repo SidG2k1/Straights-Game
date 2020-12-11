@@ -6,7 +6,7 @@
 class ComputerPlayer: public Player {
     private:
     public:
-        Action getAction(std::vector<Card*[13]> table) override;
+        Action getAction(std::vector<std::array<Card*, 13>> table) override;
 };
 
 #endif

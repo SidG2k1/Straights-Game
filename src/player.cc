@@ -1,9 +1,9 @@
 #include "player.h"
 
-bool isLegal(std::vector<Card*[13]> table, Card card) {
+bool isLegal(std::vector<std::array<Card*, 13>> table, Card card) {
     if (card.getRank() == 7) {return true;}
     else {
-        Card** deck = table[card.suiteToEnum(card.getSuite())];
+        std::array<Card *, 13> deck = table[card.suiteToEnum(card.getSuite())];
         int cardIdx = card.getRank() - 1;
         if (cardIdx == 12 && deck[11] != nullptr) {
             // king case

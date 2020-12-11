@@ -3,7 +3,7 @@
 Board::Board() {
     // initializes the board.
     for (int i = 0; i < 4; ++i) {
-        Card* newSuiteList[13];
+        std::array<Card*, 13> newSuiteList;
         for (int j = 0; j < 13; ++j) {newSuiteList[j] = nullptr;}
         table.push_back(newSuiteList);
     }

@@ -1,6 +1,10 @@
 #ifndef CARD
 #define CARD
 
+// array is included here because Card is eventually included in all files, making array 
+//  effectively universally accessible
+#include <array>
+
 class Card {
     private:
         char suite;

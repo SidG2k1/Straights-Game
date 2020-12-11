@@ -21,7 +21,7 @@ class Board {
 
         // The group of 4 suites of 13 cards each.
         //     nullptr representes an unplayed card.
-        std::vector<Card*[13]> table;
+        std::vector<std::array<Card*, 13>> table;
 
         void printDeck();
 
