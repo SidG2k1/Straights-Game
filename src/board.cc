@@ -1,12 +1,17 @@
 #include "board.h"
 
-Board::Board() {
-    // initializes the board.
+void Board::resetTable() {
+    table.clear();
     for (int i = 0; i < 4; ++i) {
         std::array<Card*, 13> newSuiteList;
         for (int j = 0; j < 13; ++j) {newSuiteList[j] = nullptr;}
         table.push_back(newSuiteList);
     }
+}
+
+Board::Board() {
+    // initializes the board
+    resetTable();
     initPlayers();
 }
 
@@ -38,8 +43,8 @@ void Board::initPlayers() {
 }
 
 void Board::printDeck() {
-    for (int i = 0; i < 52; ++i) {
-        std::cout << shuffledDeck[i].getName() << " ";
+    for (int i = 0; i <= 52; ++i) {
+        std::cout << shuffledDeck[i - 1].getName() << " ";
         if ((i != 0) && (i%13 == 0)) {std::cout << std::endl;}
     }
 }
@@ -100,15 +105,14 @@ char enumToSuite(int suiteNum) {
 void Board::start(int seed) {
 
     // Fill Board::shuffledDeck
-    for (int rank = 1; rank <= 13; ++rank) {
-        for (int suite = 0; suite < 4; ++suite) {
+    for (int suite = 0; suite < 4; ++suite) {
+        for (int rank = 1; rank <= 13; ++rank) {
             Card card{rankToValue(rank), enumToSuite(suite)};
             shuffledDeck.push_back(card);
         }
     }
 
-    while (maxDiscardSum() < 80)
-    {
+    while (maxDiscardSum() < 80) {
         shuffleDeck(seed);
         dealCards();
 
@@ -128,7 +132,7 @@ void Board::start(int seed) {
             if (found) {break;}
         }
 
-        std::cout << "A new round begins. It's Player" << playerIdxWith7S + 1 << "'s turn to play.";
+        std::cout << "A new round begins. It's Player" << playerIdxWith7S + 1 << "'s turn to play." << std::endl;
 
         int currentPlayerIdx = playerIdxWith7S;
         // play game until cards run out
@@ -164,6 +168,7 @@ void Board::start(int seed) {
                 } 
                 else if (act.isDiscard) {
                     std::cout << "Player" << currentPlayerIdx + 1 << " discards " << act.card.getName() << ".\n";
+                    // Add card's rank to the players discard sum
                     players[currentPlayerIdx].get()->discardRankSum += act.card.getRank();
 
                     auto dealtCards = &(players[currentPlayerIdx].get()->dealtCards);
@@ -196,15 +201,27 @@ void Board::start(int seed) {
         
         // End of round summary
         for (int i = 0; i < 4; ++i) {
+            int thisRoundScore = 0;
             std::cout << "Player" << i + 1 << "'s discards: ";
-            for (Card discard : playerDiscardStash[i]) {std::cout << discard.getName() << " ";}
+            for (Card discard : playerDiscardStash[i]) {
+                std::cout << discard.getName() << " ";
+                thisRoundScore += discard.getRank();
+            }
             std::cout << std::endl;
 
             std::cout << "Player" << i + 1 << "'s score: ";
-            if (playerDiscardStash[i].size() > 0) {std::cout << playerDiscardStash[i][0].getRank();}
+
+            // Sum of previous rounds' scores
+            std::cout << players[i].get()->discardRankSum - thisRoundScore;
+
             for (Card discard : playerDiscardStash[i]) {std::cout << " + " << discard.getRank();}
-            std::cout << " = " << players[i].get()->discardRankSum;
+            std::cout << " = " << players[i].get()->discardRankSum << std::endl;
+
+            // clear discard list
+            playerDiscardStash[i].clear();
         }
+        // clear table
+        resetTable();
     }
 
     // End of game summary (i.e. state winner)

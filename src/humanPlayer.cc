@@ -75,6 +75,7 @@ Action HumanPlayer::getAction(std::vector<std::array<Card*, 13>> table, bool pri
         }
         else if (command == "deck") {
             act.isDeck = true;
+            break;
         }
         else if (command == "quit" || command == "") {
             act.isQuit = true;

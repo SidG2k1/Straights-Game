@@ -14,6 +14,9 @@ class Board {
         // The group of players in the game
         std::array<std::shared_ptr<Player>, 4> players;
 
+        // clears the table
+        void resetTable();
+        
         // Adds a new player to the game. Must have less than 4
         //     players already
         void initPlayers();
