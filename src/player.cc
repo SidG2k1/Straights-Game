@@ -27,6 +27,6 @@ bool Player::isLegal(std::vector<std::array<Card*, 13>> table, Card card) {
     }
 }
 
-Action Player::getAction(std::vector<std::array<Card*, 13>> table) {
+Action Player::getAction(std::vector<std::array<Card*, 13>> table, bool printTable) {
     return Action{};
 }
