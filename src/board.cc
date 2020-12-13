@@ -157,6 +157,12 @@ void Board::start(int seed) {
         while (players[currentPlayerIdx].get()->dealtCards.size() != 0) {
             // ^^^^^ Not all cards have been played yet by the player. (when this statement
             // evaluates to false, all players have played all cards.)
+
+            if (enableBonus) {
+                for (int i = 0; i < 6; ++i) {std::cout << std::endl;}
+                std::cout << "\nIt is Player" << currentPlayerIdx + 1 << "'s turn:\n";
+            }
+
             bool printTable = true;
 
             if (tiredPlayerIdx != -1) {
