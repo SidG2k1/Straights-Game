@@ -1,6 +1,7 @@
 #include "board.h"
 
 void Board::resetTable() {
+    // clears the table and fills with nullptrs
     table.clear();
     for (int i = 0; i < 4; ++i) {
         std::array<Card*, 13> newSuiteList;
@@ -45,6 +46,7 @@ void Board::initPlayers() {
             newPlayer.get()->isHuman = false;
         }
 
+        // all players have the same following properties:
         newPlayer->currBoard = this;
         newPlayer->discardRankSum = 0;
         players[i] = newPlayer;
@@ -54,6 +56,7 @@ void Board::initPlayers() {
 void Board::printDeck() {
     for (int i = 1; i <= 52; ++i) {
         std::cout << shuffledDeck[i - 1].getName() << " ";
+        // Create a new line every 13 cards printed:
         if ((i != 0) && (i%13 == 0)) {std::cout << std::endl;}
     }
 }
@@ -62,11 +65,15 @@ void Board::rageQuit(int playerIdx) {
     std::cout << "Player" << playerIdx + 1 << " ragequits. A computer will now take over." << std::endl;
 
     std::shared_ptr<Player> newPlayer;
+
+    // Depending on bonus, the player will be replaced by the appropriate computer
     if (enableBonus) {
         newPlayer = std::make_shared<SmartComputer>();
     } else {
         newPlayer = std::make_shared<ComputerPlayer>();
     }
+
+    // Transferring the HumanPlayer's fields to the ComputerPlayer:
     newPlayer.get()->currBoard = this; // which is equal to player.currBoard
     newPlayer.get()->dealtCards = players[playerIdx]->dealtCards;
     newPlayer.get()->discardRankSum = players[playerIdx]->discardRankSum;
@@ -81,7 +88,9 @@ void Board::shuffleDeck(int seed) {
 
 void Board::dealCards() {
     for (int playerIdx = 0; playerIdx < 4; ++playerIdx) {
+        // Remove the cards from the player's hand
         players[playerIdx]->dealtCards.clear();
+        // Give a contigouous set of 13 cards to the player
         for (int cardNum = 0; cardNum < 13; ++cardNum) {
             players[playerIdx]->dealtCards.push_back(shuffledDeck.at(13 * playerIdx + cardNum));
         }
@@ -117,8 +126,7 @@ char enumToSuite(int suiteNum) {
 }
 
 void Board::start(int seed) {
-
-    // Fill Board::shuffledDeck
+    // Fill Board::shuffledDeck with ordered cards:
     for (int suite = 0; suite < 4; ++suite) {
         for (int rank = 1; rank <= 13; ++rank) {
             Card card{rankToValue(rank), enumToSuite(suite)};
@@ -127,18 +135,18 @@ void Board::start(int seed) {
     }
 
     while (maxDiscardSum() < 80) {
+        // ^^ keep looping while everyone's score is below 80
         shuffleDeck(seed);
         dealCards();
 
-        int playerIdxWith7S = 0;
-        Card sevenSpades{'7', 'S'};
+        int currentPlayerIdx = 0;
         // searching for the player which "owns" a 7 of Spades.
         for (int i = 0; i < 4; ++i) {
             bool found = false;
             for (int j = 0; j < 13; ++j) {
                 Card card = players[i].get()->dealtCards[j];
-                if (card == sevenSpades) {
-                    playerIdxWith7S = i;
+                if (card == Card{'7', 'S'}) {
+                    currentPlayerIdx = i;
                     found = true;
                     break;
                 }
@@ -146,18 +154,18 @@ void Board::start(int seed) {
             if (found) {break;}
         }
 
-        std::cout << "A new round begins. It's Player" << playerIdxWith7S + 1 << "'s turn to play." << std::endl;
+        std::cout << "A new round begins. It's Player" << currentPlayerIdx + 1 << "'s turn to play." << std::endl;
 
         int tiredPlayerIdx = -1;
         int tiredPlayers = 0;
         bool tiredEndRound = false;
 
-        int currentPlayerIdx = playerIdxWith7S;
         // play game until cards run out
         while (players[currentPlayerIdx].get()->dealtCards.size() != 0) {
             // ^^^^^ Not all cards have been played yet by the player. (when this statement
             // evaluates to false, all players have played all cards.)
 
+            // Improve spacing for easier gameplay
             if (enableBonus) {
                 for (int i = 0; i < 6; ++i) {std::cout << std::endl;}
                 std::cout << "\nIt is Player" << currentPlayerIdx + 1 << "'s turn:\n";
@@ -168,10 +176,10 @@ void Board::start(int seed) {
             if (tiredPlayerIdx != -1) {
                 // someone is tired.
                 if (tiredPlayerIdx == currentPlayerIdx) {
-                    // have come full circle
-                    tiredPlayerIdx = -1;
+                    // have come full circle after poll
+                    tiredPlayerIdx = -1; // reset poll state
                     if (tiredPlayers == 4) {
-                        tiredEndRound = true;
+                        tiredEndRound = true; // will end game this round
                         std::cout << "Congratulations, your poll has passed! The game will end this round. ";
                         std::cout << "Please let your co-players know.";
                     } else {
@@ -181,11 +189,13 @@ void Board::start(int seed) {
                     std::cout << std::endl;
                 } else {
                     if (players[currentPlayerIdx].get()->isHuman) {
+
                         std::cout << "Hi! Just a quick message before you start your turn: \n";
                         std::cout << "Player" << tiredPlayerIdx + 1 << " is tired of the game. Would you like to make this ";
                         std::cout << "the last round?\nType \"y\" for yes and \"n\" for no.\n>";
                         std::string response;
                         std::cin >> response;
+
                         if (response == "y") {
                             std::cout << "Thanks, noted. Onto your turn:" << std::endl;
                             tiredPlayers++;
@@ -205,7 +215,6 @@ void Board::start(int seed) {
 
             while (true) {
                 Action act = players[currentPlayerIdx].get()->getAction(table, printTable);
-                // Consider throwing a "QuitSignal"
 
                 if (act.isPlay) {
                     std::cout << "Player" << currentPlayerIdx + 1 << " plays " << act.card.getName() << ".\n";
@@ -274,6 +283,7 @@ void Board::start(int seed) {
                     printTable = false;
                 }
             }
+            // increment current player
             currentPlayerIdx = (currentPlayerIdx + 1) % 4;
         }
         
@@ -306,6 +316,7 @@ void Board::start(int seed) {
 
     // End of game summary (i.e. state winner(s))
     int minScore = INT32_MAX; // larger than any possible discardRankSum
+    // find the minimum score this game
     for (int playerIdx = 0; playerIdx < 4; ++playerIdx) {
         int playerScore = players[playerIdx].get()->discardRankSum;
         if (playerScore < minScore) {
@@ -313,6 +324,7 @@ void Board::start(int seed) {
         }
     }
 
+    // print player wins for each person with minscore = score.
     for (int playerIdx = 0; playerIdx < 4; ++playerIdx) {
         if (players[playerIdx].get()->discardRankSum == minScore) {
             std::cout << "Player" << playerIdx + 1 << " wins!" << std::endl;

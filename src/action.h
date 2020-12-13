@@ -9,7 +9,9 @@ class Action {
         Action();
         ~Action() {}
 
+        // The card associated with this action
         Card card;
+        
         bool isPlay = false;
         bool isDiscard = false;
         bool isQuit = false;

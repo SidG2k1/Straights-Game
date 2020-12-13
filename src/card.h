@@ -2,7 +2,7 @@
 #define CARD
 
 // array is included here because Card is eventually included in all files, making array 
-//  effectively universally accessible
+//  universally accessible by all classes
 #include <array>
 #include <string>
 
@@ -12,6 +12,8 @@ class Card {
         char value;
     public:
         Card(); // Avoid using if possible
+
+        // Creates a card with the specified value and suite
         Card(char value, char suite);
         ~Card() {}
 
@@ -21,15 +23,17 @@ class Card {
         char getValue();
 
         int getRank();
+
+        // represents the colloquial name of the card. (e.g. "7S" for seven of spades)
         std::string getName();
 
         bool operator==(const Card &other) const;
-
-        // FIXME: better implementation exist for the following
-        //  method
+        
+        // Converts from a suite to an enumerated int for ease in vector/array ordering
         static int suiteToEnum(char suite);
 };
 
+// thrown whenever there is an invalid data call to the Card.
 class InvalidCardData {};
 
 #endif
