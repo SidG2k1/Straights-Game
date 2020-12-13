@@ -9,6 +9,7 @@ int main(int argc, char** argv) {
 			std::string bonusFlag = "--enablebonus";
 			if (argv[1] != bonusFlag) {
 				seed = std::stoi(argv[1]);
+				seed = (seed < 0) ? (-seed) : (seed); // force seed to be non-negative
 			}
 
 			for (int i = 0; i < argc; ++i) {
