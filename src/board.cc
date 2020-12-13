@@ -19,9 +19,13 @@ void Board::initPlayers() {
     for (int i = 0; i < 4; ++i) {
         std::cout << "Is Player" << i + 1 << "  a human (h) or a computer (c)?" << std::endl;
         std::cout << ">";
-        std::string playerType;
-        while ((!(std::cin >> playerType)) || (playerType != "h" && playerType != "c")) {
+        std::string playerType = "";
+        while ((!(std::cin >> playerType)) || (playerType != "h" && playerType != "c" && playerType != "")) {
             // this is not in spec, but makes it more robust
+            if (playerType == "") {
+                // Ctrl-D Quit Signal
+                throw QuitSignal{};
+            }
             std::cout << "Please make your selection again: Can't interpret " << playerType << ".\n>";
         }
         if (playerType == "h") {
@@ -43,7 +47,7 @@ void Board::initPlayers() {
 }
 
 void Board::printDeck() {
-    for (int i = 0; i <= 52; ++i) {
+    for (int i = 1; i <= 52; ++i) {
         std::cout << shuffledDeck[i - 1].getName() << " ";
         if ((i != 0) && (i%13 == 0)) {std::cout << std::endl;}
     }
