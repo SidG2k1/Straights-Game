@@ -220,20 +220,23 @@ void Board::start(int seed) {
             // clear discard list
             playerDiscardStash[i].clear();
         }
+        
         // clear table
         resetTable();
     }
 
-    // End of game summary (i.e. state winner)
-    int minScore = (13 + 1) * (52 + 1); // larger than any possible discardRankSum
-    int minRankPlayerIdx = 0;
-    for (; minRankPlayerIdx < 4; ++minRankPlayerIdx) {
-        int playerScore = players[minRankPlayerIdx].get()->discardRankSum;
+    // End of game summary (i.e. state winner(s))
+    int minScore = INT32_MAX; // larger than any possible discardRankSum
+    for (int playerIdx = 0; playerIdx < 4; ++playerIdx) {
+        int playerScore = players[playerIdx].get()->discardRankSum;
         if (playerScore < minScore) {
             minScore = playerScore;
-            break;
         }
     }
 
-    std::cout << "Player" << minRankPlayerIdx + 1 << " wins!" << std::endl;
+    for (int playerIdx = 0; playerIdx < 4; ++playerIdx) {
+        if (players[playerIdx].get()->discardRankSum == minScore) {
+            std::cout << "Player" << playerIdx + 1 << " wins!" << std::endl;
+        }
+    }
 }
