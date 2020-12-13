@@ -4,6 +4,7 @@
 #include "player.h"
 #include "humanPlayer.h"
 #include "computerPlayer.h"
+#include "smartComputer.h"
 
 #include <algorithm>
 #include <random>
@@ -19,7 +20,7 @@ class Board {
         
         // Adds a new player to the game. Must have less than 4
         //     players already
-        void initPlayers();
+        void initPlayers(bool enableBonus);
 
         std::vector<Card> shuffledDeck;
 
@@ -32,11 +33,13 @@ class Board {
         // Returns the maximum Player::discardRankSum among all Board::players
         int maxDiscardSum();
 
+        // The pile of discards from each player
         std::array<std::vector<Card>, 4> playerDiscardStash;
+        
         std::vector<std::shared_ptr<Card>> smartCardPtrStore;
     public:
         // Initializes the board
-        Board();
+        Board(bool enableBonus);
 
         ~Board() {}
 
@@ -51,7 +54,7 @@ class Board {
         void rageQuit(int playerIdx);
 
         // This is the primary method of play.
-        void start(int seed);
+        void start(int seed, bool enableBonus);
 };
 
 class QuitSignal{};

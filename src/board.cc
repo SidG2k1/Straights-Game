@@ -9,13 +9,13 @@ void Board::resetTable() {
     }
 }
 
-Board::Board() {
+Board::Board(bool enableBonus) {
     // initializes the board
     resetTable();
-    initPlayers();
+    initPlayers(enableBonus);
 }
 
-void Board::initPlayers() {
+void Board::initPlayers(bool enableBonus) {
     for (int i = 0; i < 4; ++i) {
         std::cout << "Is Player" << i + 1 << "  a human (h) or a computer (c)?" << std::endl;
         std::cout << ">";
@@ -28,21 +28,25 @@ void Board::initPlayers() {
             }
             std::cout << "Please make your selection again: Can't interpret " << playerType << ".\n>";
         }
+        
+        std::shared_ptr<Player> newPlayer;
+
         if (playerType == "h") {
-            auto newPlayer = std::make_shared<HumanPlayer>();
-            auto player = newPlayer.get();
-            player->currBoard = this;
-            player->discardRankSum = 0;
-            player->isHuman = true;
-            players[i] = newPlayer;
-        } else if (playerType == "c") {
-            auto newPlayer = std::make_shared<ComputerPlayer>();
-            auto player = newPlayer.get();
-            player->currBoard = this;
-            player->discardRankSum = 0;
-            player->isHuman = false;
-            players[i] = newPlayer;
+            newPlayer = std::make_shared<HumanPlayer>();
+            newPlayer.get()->isHuman = true;
         }
+        else if (playerType == "c") {
+            if (enableBonus) {
+                newPlayer = std::make_shared<SmartComputer>();
+            } else {
+                newPlayer = std::make_shared<ComputerPlayer>();
+            }
+            newPlayer.get()->isHuman = false;
+        }
+
+        newPlayer->currBoard = this;
+        newPlayer->discardRankSum = 0;
+        players[i] = newPlayer;
     }
 }
 
@@ -106,7 +110,7 @@ char enumToSuite(int suiteNum) {
     throw InvalidCardData{};
 }
 
-void Board::start(int seed) {
+void Board::start(int seed, bool enableBonus) {
 
     // Fill Board::shuffledDeck
     for (int suite = 0; suite < 4; ++suite) {
