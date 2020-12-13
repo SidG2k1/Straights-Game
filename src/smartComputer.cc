@@ -21,7 +21,8 @@ Action SmartComputer::getAction(std::vector<std::array<Card*, 13>> table, bool p
         if (isLegal(table, dealtCards[i])) {
             existsPlay = true;
         }
-        if (cardRank > highestRank) {
+        if (cardRank > highestRank && isLegal(table, dealtCards[i])) {
+            // highest card only is valid when legal
             highestRank = cardRank;
         }
         if (cardRank < lowestRank) {
@@ -31,7 +32,7 @@ Action SmartComputer::getAction(std::vector<std::array<Card*, 13>> table, bool p
 
     for (int i = 0; i < cardCount; ++i) {
         if (existsPlay) {
-            if (dealtCards[i].getRank() == highestRank) {
+            if (dealtCards[i].getRank() == highestRank && isLegal(table, dealtCards[i])) {
                 act.card = dealtCards[i];
                 act.isPlay = true;
                 break;

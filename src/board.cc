@@ -11,11 +11,12 @@ void Board::resetTable() {
 
 Board::Board(bool enableBonus) {
     // initializes the board
+    this->enableBonus = enableBonus;
     resetTable();
-    initPlayers(enableBonus);
+    initPlayers();
 }
 
-void Board::initPlayers(bool enableBonus) {
+void Board::initPlayers() {
     for (int i = 0; i < 4; ++i) {
         std::cout << "Is Player" << i + 1 << "  a human (h) or a computer (c)?" << std::endl;
         std::cout << ">";
@@ -60,7 +61,12 @@ void Board::printDeck() {
 void Board::rageQuit(int playerIdx) {
     std::cout << "Player" << playerIdx + 1 << " ragequits. A computer will now take over." << std::endl;
 
-    auto newPlayer = std::make_shared<ComputerPlayer>();
+    std::shared_ptr<Player> newPlayer;
+    if (enableBonus) {
+        newPlayer = std::make_shared<SmartComputer>();
+    } else {
+        newPlayer = std::make_shared<ComputerPlayer>();
+    }
     newPlayer.get()->currBoard = this; // which is equal to player.currBoard
     newPlayer.get()->dealtCards = players[playerIdx]->dealtCards;
     newPlayer.get()->discardRankSum = players[playerIdx]->discardRankSum;
@@ -110,7 +116,7 @@ char enumToSuite(int suiteNum) {
     throw InvalidCardData{};
 }
 
-void Board::start(int seed, bool enableBonus) {
+void Board::start(int seed) {
 
     // Fill Board::shuffledDeck
     for (int suite = 0; suite < 4; ++suite) {
@@ -142,12 +148,55 @@ void Board::start(int seed, bool enableBonus) {
 
         std::cout << "A new round begins. It's Player" << playerIdxWith7S + 1 << "'s turn to play." << std::endl;
 
+        int tiredPlayerIdx = -1;
+        int tiredPlayers = 0;
+        bool tiredEndRound = false;
+
         int currentPlayerIdx = playerIdxWith7S;
         // play game until cards run out
         while (players[currentPlayerIdx].get()->dealtCards.size() != 0) {
             // ^^^^^ Not all cards have been played yet by the player. (when this statement
             // evaluates to false, all players have played all cards.)
             bool printTable = true;
+
+            if (tiredPlayerIdx != -1) {
+                // someone is tired.
+                if (tiredPlayerIdx == currentPlayerIdx) {
+                    // have come full circle
+                    tiredPlayerIdx = -1;
+                    if (tiredPlayers == 4) {
+                        tiredEndRound = true;
+                        std::cout << "Congratulations, your poll has passed! The game will end this round. ";
+                        std::cout << "Please let your co-players know.";
+                    } else {
+                        std::cout << "Unfortunately not all players are tired, so you will have to keep playing or quit";
+                        tiredPlayers = 0;
+                    }
+                    std::cout << std::endl;
+                } else {
+                    if (players[currentPlayerIdx].get()->isHuman) {
+                        std::cout << "Hi! Just a quick message before you start your turn: \n";
+                        std::cout << "Player" << tiredPlayerIdx + 1 << " is tired of the game. Would you like to make this ";
+                        std::cout << "the last round?\nType \"y\" for yes and \"n\" for no.\n>";
+                        std::string response;
+                        std::cin >> response;
+                        if (response == "y") {
+                            std::cout << "Thanks, noted. Onto your turn:" << std::endl;
+                            tiredPlayers++;
+                        } else if (response == "n") {
+                            std::cout << "Thanks, noted. Onto your turn:" << std::endl;
+                        } else {
+                            std::cout << "You made a typo... sound like you're tired!" << std::endl;
+                            tiredPlayers++;
+                        }
+                    } else {
+                        // Computers vote tired
+                        tiredPlayers++;
+                    }
+                    
+                }
+            }
+
             while (true) {
                 Action act = players[currentPlayerIdx].get()->getAction(table, printTable);
                 // Consider throwing a "QuitSignal"
@@ -194,7 +243,22 @@ void Board::start(int seed, bool enableBonus) {
                 else if (act.isQuit) {
                     throw QuitSignal{};
                     break;
-                } 
+                }
+                else if (act.isTired) {
+                    if (!enableBonus) {
+                        std::cout << "Unfortunaely since you have opted to play without bonuses, ";
+                        std::cout << "you will have to sit this one through (or quit)." << std::endl;
+                    } else if (tiredPlayerIdx != -1) {
+                        std::cout << "A tiredness poll is happening this round. Please wait." << std::endl;
+                    } else {
+                        // Need to make this round the final round if all other players agree
+                        std::cout << "All other human players will be asked if they want to end on this round. ";
+                        std::cout << "Meanwhile, please play your turn:" << std::endl;
+                        tiredPlayerIdx = currentPlayerIdx;
+                        ++tiredPlayers;
+                    }
+                    printTable = false;
+                }
                 else if (act.isRageQuit) {
                     rageQuit(currentPlayerIdx);
                     // break; // No break since computer need to play
@@ -231,6 +295,7 @@ void Board::start(int seed, bool enableBonus) {
         
         // clear table
         resetTable();
+        if (tiredEndRound) {break;}
     }
 
     // End of game summary (i.e. state winner(s))

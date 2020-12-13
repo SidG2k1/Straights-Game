@@ -14,7 +14,8 @@ class Action {
         bool isDiscard = false;
         bool isQuit = false;
         bool isRageQuit = false;
-        bool isDeck = true;
+        bool isDeck = false;
+        bool isTired = false;
 };
 
 #endif

@@ -15,12 +15,15 @@ class Board {
         // The group of players in the game
         std::array<std::shared_ptr<Player>, 4> players;
 
+        // If bonuses are enabled this game
+        bool enableBonus;
+
         // clears the table
         void resetTable();
         
         // Adds a new player to the game. Must have less than 4
         //     players already
-        void initPlayers(bool enableBonus);
+        void initPlayers();
 
         std::vector<Card> shuffledDeck;
 
@@ -35,7 +38,7 @@ class Board {
 
         // The pile of discards from each player
         std::array<std::vector<Card>, 4> playerDiscardStash;
-        
+
         std::vector<std::shared_ptr<Card>> smartCardPtrStore;
     public:
         // Initializes the board
@@ -54,7 +57,7 @@ class Board {
         void rageQuit(int playerIdx);
 
         // This is the primary method of play.
-        void start(int seed, bool enableBonus);
+        void start(int seed);
 };
 
 class QuitSignal{};
