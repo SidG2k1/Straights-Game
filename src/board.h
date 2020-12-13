@@ -40,11 +40,6 @@ class Board {
         std::array<std::vector<Card>, 4> playerDiscardStash;
 
         std::vector<std::shared_ptr<Card>> smartCardPtrStore;
-    public:
-        // Initializes the board
-        Board(bool enableBonus);
-
-        ~Board() {}
 
         // The group of 4 suites of 13 cards each.
         //     nullptr representes an unplayed card.
@@ -55,6 +50,11 @@ class Board {
         // Player chooses to end their gaming, and is replaced by
         //   a ComputerPlayer
         void rageQuit(int playerIdx);
+    public:
+        // Initializes the board
+        Board(bool enableBonus);
+
+        ~Board() {}
 
         // This is the primary method of play.
         void start(int seed);
