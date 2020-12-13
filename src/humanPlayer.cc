@@ -30,6 +30,7 @@ Action HumanPlayer::getAction(std::vector<std::array<Card*, 13>> table, bool pri
         if (command == "play") {
             try {
                 std::cin >> cardName;
+                if (cardName.length() > 2) {throw InvalidCardData{};}
                 ccard.setValue(cardName[0]);
                 ccard.setSuite(cardName[1]);
             } catch (...) {
@@ -53,6 +54,7 @@ Action HumanPlayer::getAction(std::vector<std::array<Card*, 13>> table, bool pri
         else if (command == "discard") {
             try {
                 std::cin >> cardName;
+                if (cardName.length() > 2) {throw InvalidCardData{};}
                 ccard.setValue(cardName[0]);
                 ccard.setSuite(cardName[1]);
             } catch (...) {
@@ -96,7 +98,7 @@ void printDeck(Board* board, int suite, std::vector<std::array<Card*, 13>> table
     for (int i = 0; i < 13; ++i) {
         Card* ccard = table.at(suite)[i];
         if (ccard != nullptr) {
-            std::cout << ccard->getName() << " ";
+            std::cout << ccard->getValue() << " ";
         }
     }
     std::cout << std::endl;

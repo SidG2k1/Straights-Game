@@ -19,9 +19,13 @@ void Board::initPlayers() {
     for (int i = 0; i < 4; ++i) {
         std::cout << "Is Player" << i + 1 << "  a human (h) or a computer (c)?" << std::endl;
         std::cout << ">";
-        std::string playerType;
-        while ((!(std::cin >> playerType)) || (playerType != "h" && playerType != "c")) {
+        std::string playerType = "";
+        while ((!(std::cin >> playerType)) || (playerType != "h" && playerType != "c" && playerType != "")) {
             // this is not in spec, but makes it more robust
+            if (playerType == "") {
+                // Ctrl-D Quit Signal
+                throw QuitSignal{};
+            }
             std::cout << "Please make your selection again: Can't interpret " << playerType << ".\n>";
         }
         if (playerType == "h") {
@@ -43,7 +47,7 @@ void Board::initPlayers() {
 }
 
 void Board::printDeck() {
-    for (int i = 0; i <= 52; ++i) {
+    for (int i = 1; i <= 52; ++i) {
         std::cout << shuffledDeck[i - 1].getName() << " ";
         if ((i != 0) && (i%13 == 0)) {std::cout << std::endl;}
     }
@@ -220,20 +224,23 @@ void Board::start(int seed) {
             // clear discard list
             playerDiscardStash[i].clear();
         }
+        
         // clear table
         resetTable();
     }
 
-    // End of game summary (i.e. state winner)
-    int minScore = (13 + 1) * (52 + 1); // larger than any possible discardRankSum
-    int minRankPlayerIdx = 0;
-    for (; minRankPlayerIdx < 4; ++minRankPlayerIdx) {
-        int playerScore = players[minRankPlayerIdx].get()->discardRankSum;
+    // End of game summary (i.e. state winner(s))
+    int minScore = INT32_MAX; // larger than any possible discardRankSum
+    for (int playerIdx = 0; playerIdx < 4; ++playerIdx) {
+        int playerScore = players[playerIdx].get()->discardRankSum;
         if (playerScore < minScore) {
             minScore = playerScore;
-            break;
         }
     }
 
-    std::cout << "Player" << minRankPlayerIdx + 1 << " wins!";
+    for (int playerIdx = 0; playerIdx < 4; ++playerIdx) {
+        if (players[playerIdx].get()->discardRankSum == minScore) {
+            std::cout << "Player" << playerIdx + 1 << " wins!" << std::endl;
+        }
+    }
 }
