@@ -11,5 +11,15 @@ $(EXEC):
 	cd src && make && mv $(EXEC) ../ && make clean
 
 .PHONY: clean
+.PHONY: DD2
+DD2:
+	mkdir DD2-zip
+	cp src/* DD2-zip
+	cp DD2-pdfs/demo/demo.pdf DD2-zip
+	cp DD2-pdfs/DesignDoc/design.pdf DD2-zip
+	cp DD2-pdfs/UML/uml-final.pdf DD2-zip
+	cd DD2-zip && zip straights.zip *
+	cp DD2-zip/straights.zip .
+	rm -r DD2-zip
 clean:
 	rm  -f $(EXEC)

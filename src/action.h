@@ -9,12 +9,15 @@ class Action {
         Action();
         ~Action() {}
 
+        // The card associated with this action
         Card card;
+        
         bool isPlay = false;
         bool isDiscard = false;
         bool isQuit = false;
         bool isRageQuit = false;
-        bool isDeck = true;
+        bool isDeck = false;
+        bool isTired = false;
 };
 
 #endif

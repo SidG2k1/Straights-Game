@@ -79,6 +79,10 @@ Action HumanPlayer::getAction(std::vector<std::array<Card*, 13>> table, bool pri
             act.isDeck = true;
             break;
         }
+        else if (command == "imtired") {
+            act.isTired = true;
+            break;
+        }
         else if (command == "quit" || command == "") {
             act.isQuit = true;
             break;
